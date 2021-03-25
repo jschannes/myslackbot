@@ -1,0 +1,14 @@
+[
+  {
+    "number": "1",
+    "author": "Florentin Coyard",
+    "tag": "JS",
+    "tip": "Utiliser *console.table()* pour console loger des tableaux ou objets sous un format plus facilement lisible"
+  },
+  {
+    "number": "2",
+    "author": "Jean-Baptiste Schannes",
+    "tag": "Agilité",
+    "tip": "Tout dépend du contexte !"
+  }
+]

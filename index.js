@@ -38,7 +38,7 @@ app.command('/echo', async ({ command, ack, say }) => {
 
 
 // Listen for a slash command invocation
-app.command('/server_status', async ({ ack, body, client, user_name }) => {
+app.command('/server_status', async ({ ack, body,view, client, user_name }) => {
   // Acknowledge the command request
   await ack();
 
@@ -158,6 +158,24 @@ app.command('/server_status', async ({ ack, body, client, user_name }) => {
       }
     });
     console.log(result);
+
+    const user = body ['body']['id'];
+    console.log(view)
+    const val = view['state']['values']['block_1']['input_a'];
+    const results = await db.set(user.input, val)
+
+    let messageToReturn = "Trop bien biloute tu as submit un truc"
+    if( results) {
+      messageToReturn = "J' ai reussi a recup les datas du form"
+    }else{
+      messageToReturn = "Trop bien biloute tu as submit un truc"
+     
+    }
+
+    await client.chat.postMessage({
+      channel: user,
+      text: messageToReturn
+    })
   }
   catch (error) {
     console.error(error);

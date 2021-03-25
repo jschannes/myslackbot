@@ -36,6 +36,144 @@ app.command('/echo', async ({ command, ack, say }) => {
   await say(`${command.text}`);
 });
 
+
+app.command('/status', async ({ command, ack, say , user_name}) => {
+  // Acknowledge command request
+  await ack();
+
+  await say(`${command.text}`);
+});
+
+
+// Listen for a slash command invocation
+app.command('/serverStatus', async ({ ack, body, client, user_name }) => {
+  // Acknowledge the command request
+  await ack();
+
+  try {
+    // Call views.open with the built-in client
+    const result = await client.views.open({
+      // Pass a valid trigger_id within 3 seconds of receiving it
+      trigger_id: body.trigger_id,
+      // View payload
+      view: {
+        type: 'modal',
+        // View identifier
+        callback_id: 'view_1',
+        title: {
+          type: 'plain_text',
+          text: "Demander le status d'un serveur / API"
+        },
+        blocks: [
+          {
+            type: "header",
+            text: {
+              type: "plain_text",
+              text: `Salut ${user_name}, alors comme ça tu veux connaitre le status d'un serveur / API ? `,
+              emoji: true
+            }
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "Pour quel envirronnement ?"
+            },
+            accessory: {
+              type: "static_select",
+              placeholder: {
+                type: "plain_text",
+                text: "env",
+                emoji: true
+              },
+              options: [
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "DEV",
+                    emoji: true
+                  },
+                  value: "dev"
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "QLF",
+                    emoji: true
+                  },
+                  value: "qlf"
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "PPROD",
+                    emoji: true
+                  },
+                  value: "pprod"
+                }
+              ],
+              action_id: "static_select-action_env"
+            }
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "Pour quel API ?"
+            },
+            accessory: {
+              type: "static_select",
+              placeholder: {
+                type: "plain_text",
+                text: "api",
+                emoji: true
+              },
+              options: [
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "Cart",
+                    emoji: true
+                  },
+                  value: "cart"
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "Promise",
+                    emoji: true
+                  },
+                  value: "promise"
+                },
+                {
+                  text: {
+                    type: "plain_text",
+                    text: "Payment",
+                    emoji: true
+                  },
+                  value: "payment"
+                }
+              ],
+              action_id: "static_select-action_api"
+            }
+          },
+          
+        ],
+        submit: {
+          type: 'plain_text',
+          text: 'Submit'
+        }
+      }
+    });
+    console.log(result);
+  }
+  catch (error) {
+    console.error(error);
+  }
+});
+
+
+
 /* Add functionality here */
 
 (async () => {

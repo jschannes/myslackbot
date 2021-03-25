@@ -1,4 +1,5 @@
 const { App } = require('@slack/bolt');
+const axios = require('axios');
 
 const dotenv = require('dotenv')
 dotenv.config()
@@ -10,13 +11,22 @@ const app = new App({
 });
 
 app.event('app_mention', async ({ context, event }) => {
-
   try{
-    await app.client.chat.postMessage({
-    token: context.botToken,
-    channel: event.channel,
-    text: `Hey yoo <@${event.user}>`
-  });
+    if(event.text.includes(' random tip')) {
+      await randomTip(context.botToken, event.channel)
+    } else if(event.text.includes(' random joke')) {
+      await randomJoke(context.botToken, event.channel)
+    } else if(event.text.includes(' hello')) {
+      await app.client.chat.postMessage({
+        token: context.botToken,
+        channel: event.channel,
+        text: `Hello <@${event.user}>`
+      })
+    } else if(event.text.includes(' help')) {
+      await runHelp(context.botToken, event.channel)
+    } else {
+      await runDefault(context.botToken, event.channel)
+    }
   }
   catch (e) {
     console.log(`error responding ${e}`);
@@ -24,17 +34,50 @@ app.event('app_mention', async ({ context, event }) => {
 
 });
 
-app.message('hello', async ({ message, say }) => {
-  console.log(message)
-  await say(`Salut`);
-});
+function randomTip(token, channel) {
+  axios.get('https://raw.githubusercontent.com/jschannes/myslackbot/main/tip.json')
+  .then(res => {
+    const tips = res.data;
+    const random = Math.floor(Math.random() * tips.length);
+    const tip = tips[random].tip
+    const author = tips[random].author
 
-app.command('/echo', async ({ command, ack, say }) => {
-  // Acknowledge command request
-  await ack();
+    app.client.chat.postMessage({
+      token: token,
+      channel: channel,
+      text: `:heart: ${tip} - *${author}*`
+    })
+  })
+}
 
-  await say(`${command.text}`);
-});
+function randomJoke(token, channel) {
+  axios.get('https://api.chucknorris.io/jokes/random')
+    .then(res => {
+      const joke = res.data.value;
+      
+      app.client.chat.postMessage({
+        token: token,
+        channel: channel,
+        text: `:zap: ${joke}`
+      })
+    })
+}
+
+function runHelp(token, channel) {
+  app.client.chat.postMessage({
+    token: token,
+    channel: channel,
+    text: `Type *@myslackbot* with *random tip* to get a tip, *random joke* to get a Chuck Norris random joke and *help* to get this instruction again`
+  })
+}
+
+function runDefault(token, channel) {
+  app.client.chat.postMessage({
+    token: token,
+    channel: channel,
+    text: `Type *@myslackbot* with *help* to get more instructions`
+  })
+}
 
 app.action({ action_id: 'static_select-action_env'}, async (data) => {
   await data.ack();

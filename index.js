@@ -36,6 +36,20 @@ app.command('/echo', async ({ command, ack, say }) => {
   await say(`${command.text}`);
 });
 
+app.action({ action_id: 'static_select-action_env'}, async (data) => {
+  await data.ack();
+});
+
+app.action({ action_id: 'static_select-action_api'}, async (data) => {
+  await data.ack();
+});
+
+// Handle a view_submission event
+app.view('view_1', async (data) => {
+  // Acknowledge the view_submission event
+  console.log(JSON.stringify(data))
+  await data.ack();
+})
 
 // Listen for a slash command invocation
 app.command('/server_status', async ({ ack, body,view, client, user }) => {
@@ -54,14 +68,14 @@ app.command('/server_status', async ({ ack, body,view, client, user }) => {
         callback_id: 'view_1',
         title: {
           type: 'plain_text',
-          text: "Demander le status d'un serveur / API"
+          text: "Demander le status"
         },
         blocks: [
           {
             type: "header",
             text: {
               type: "plain_text",
-              text: `Salut ${user_name}, alors comme ça tu veux connaitre le status d'un serveur / API ? `,
+              text: `Salut `,
               emoji: true
             }
           },
@@ -159,27 +173,27 @@ app.command('/server_status', async ({ ack, body,view, client, user }) => {
         }
       }
     });
-    console.log(result);
+    // console.log(result);
 
-    const user = user['id'];
-    console.log(view)
-    const envSelected = view['state']['values']['choose_env']['static_select-action_env']['value'];
-    const apiSelected = view['state']['values']['choose_api']['static_select-action_api']['value'];
-    const results = await db.set(user.input, envSelected)
+    // const user = user['id'];
+    // console.log(view)
+    // const envSelected = view['state']['values']['choose_env']['static_select-action_env']['value'];
+    // const apiSelected = view['state']['values']['choose_api']['static_select-action_api']['value'];
+    // const results = await db.set(user.input, envSelected)
 
-    console.log('resultat du form: ', apiSelected, envSelected)
-    let messageToReturn = "Trop bien biloute tu as submit un truc"
-    if( results) {
-      messageToReturn = "J' ai reussi a recup les datas du form"
-    }else{
-      messageToReturn = "Trop bien biloute tu as submit un truc"
+    // console.log('resultat du form: ', apiSelected, envSelected)
+    // let messageToReturn = "Trop bien biloute tu as submit un truc"
+    // if( results) {
+    //   messageToReturn = "J' ai reussi a recup les datas du form"
+    // }else{
+    //   messageToReturn = "Trop bien biloute tu as submit un truc"
      
-    }
+    // }
 
-    await client.chat.postMessage({
-      channel: user,
-      text: messageToReturn
-    })
+    // await client.chat.postMessage({
+    //   channel: user,
+    //   text: messageToReturn
+    // })
   }
   catch (error) {
     console.error(error);

@@ -1,0 +1,16 @@
+{
+  "name": "slackbot",
+  "version": "1.0.0",
+  "description": "A simple Slackbot",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "author": "JB",
+  "dependencies": {
+    "@slack/bolt": "3.3.0",
+    "axios": "0.21.1",
+    "dotenv": "8.2.0",
+    "slackbots": "1.2.0"
+  }
+}

@@ -36,20 +36,6 @@ app.command('/echo', async ({ command, ack, say }) => {
   await say(`${command.text}`);
 });
 
-app.action({ action_id: 'static_select-action_env'}, async (data) => {
-  await data.ack();
-});
-
-app.action({ action_id: 'static_select-action_api'}, async (data) => {
-  await data.ack();
-});
-
-// Handle a view_submission event
-app.view('view_1', async (data) => {
-  // Acknowledge the view_submission event
-  console.log(JSON.stringify(data))
-  await data.ack();
-})
 
 // Listen for a slash command invocation
 app.command('/server_status', async ({ ack, body,view, client, user }) => {
@@ -65,17 +51,17 @@ app.command('/server_status', async ({ ack, body,view, client, user }) => {
       view: {
         type: 'modal',
         // View identifier
-        callback_id: 'view_1',
+        callback_id: 'view_form_status',
         title: {
           type: 'plain_text',
-          text: "Demander le status"
+          text: "Demander le status d'un serveur / API"
         },
         blocks: [
           {
             type: "header",
             text: {
               type: "plain_text",
-              text: `Salut `,
+              text: `Salut ${user_name}, alors comme ça tu veux connaitre le status d'un serveur / API ? `,
               emoji: true
             }
           },
@@ -173,34 +159,45 @@ app.command('/server_status', async ({ ack, body,view, client, user }) => {
         }
       }
     });
-    // console.log(result);
-
-    // const user = user['id'];
-    // console.log(view)
-    // const envSelected = view['state']['values']['choose_env']['static_select-action_env']['value'];
-    // const apiSelected = view['state']['values']['choose_api']['static_select-action_api']['value'];
-    // const results = await db.set(user.input, envSelected)
-
-    // console.log('resultat du form: ', apiSelected, envSelected)
-    // let messageToReturn = "Trop bien biloute tu as submit un truc"
-    // if( results) {
-    //   messageToReturn = "J' ai reussi a recup les datas du form"
-    // }else{
-    //   messageToReturn = "Trop bien biloute tu as submit un truc"
-     
-    // }
-
-    // await client.chat.postMessage({
-    //   channel: user,
-    //   text: messageToReturn
-    // })
+    console.log(result);
   }
   catch (error) {
     console.error(error);
   }
 });
 
+app.view('view_form_status', async ({ ack, body, view, client }) => {
+  // Acknowledge the view_submission event
+  await ack();
 
+  const user = body['user']['id'];
+  const envSelected = view['state']['values']['choose_env']['static_select-action_env']['value'];
+  const apiSelected = view['state']['values']['choose_api']['static_select-action_api']['value'];
+
+  let msg = ""
+  if (envSelected) {
+    msg = `You choose env ${envSelected}`;
+  }
+  
+  if (envSelected && apiSelected) {
+    msg += ` end choose api ${apiSelected}`;
+  } else {
+    if( apiSelected)
+    {
+      msg = `You choose api ${apiSelected}`;
+    }
+  }
+
+  try {
+    await client.chat.postMessage({
+      channel: user,
+      text: msg
+    });
+  }
+  catch (error) {
+    console.error(error);
+  }
+});
 
 /* Add functionality here */
 

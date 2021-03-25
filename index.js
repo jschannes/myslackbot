@@ -36,6 +36,13 @@ app.command('/echo', async ({ command, ack, say }) => {
   await say(`${command.text}`);
 });
 
+app.action({ action_id: 'static_select-action_env'}, async (data) => {
+  await data.ack();
+});
+
+app.action({ action_id: 'static_select-action_api'}, async (data) => {
+  await data.ack();
+});
 
 // Listen for a slash command invocation
 app.command('/server_status', async ({ ack, body,view, client, user }) => {
@@ -54,14 +61,14 @@ app.command('/server_status', async ({ ack, body,view, client, user }) => {
         callback_id: 'view_form_status',
         title: {
           type: 'plain_text',
-          text: "Demander le status d'un serveur / API"
+          text: "Demander le status"
         },
         blocks: [
           {
             type: "header",
             text: {
               type: "plain_text",
-              text: `Salut ${user_name}, alors comme ça tu veux connaitre le status d'un serveur / API ? `,
+              text: `Salut  `,
               emoji: true
             }
           },
@@ -166,15 +173,15 @@ app.command('/server_status', async ({ ack, body,view, client, user }) => {
   }
 });
 
-app.view('view_form_status', async ({ ack, body, view, client }) => {
+app.view('view_form_status', async ({ ack, body, view, client, context }) => {
   // Acknowledge the view_submission event
   await ack();
 
   const user = body['user']['id'];
-  const envSelected = view['state']['values']['choose_env']['static_select-action_env']['value'];
-  const apiSelected = view['state']['values']['choose_api']['static_select-action_api']['value'];
+  const envSelected = view['state']['values']['choose_env']['static_select-action_env']['selected_option']['text']['text'];
+  const apiSelected = view['state']['values']['choose_api']['static_select-action_api']['selected_option']['text']['text'];
 
-  let msg = ""
+  let msg = "test"
   if (envSelected) {
     msg = `You choose env ${envSelected}`;
   }

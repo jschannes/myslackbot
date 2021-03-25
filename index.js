@@ -37,16 +37,8 @@ app.command('/echo', async ({ command, ack, say }) => {
 });
 
 
-app.command('/status', async ({ command, ack, say , user_name}) => {
-  // Acknowledge command request
-  await ack();
-
-  await say(`${command.text}`);
-});
-
-
 // Listen for a slash command invocation
-app.command('/serverStatus', async ({ ack, body, client, user_name }) => {
+app.command('/server_status', async ({ ack, body, client, user_name }) => {
   // Acknowledge the command request
   await ack();
 

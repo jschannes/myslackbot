@@ -38,7 +38,7 @@ app.command('/echo', async ({ command, ack, say }) => {
 
 
 // Listen for a slash command invocation
-app.command('/server_status', async ({ ack, body,view, client, user_name }) => {
+app.command('/server_status', async ({ ack, body,view, client, user }) => {
   // Acknowledge the command request
   await ack();
 
@@ -67,6 +67,7 @@ app.command('/server_status', async ({ ack, body,view, client, user_name }) => {
           },
           {
             type: "section",
+            block_id:"choose_env",
             text: {
               type: "mrkdwn",
               text: "Pour quel envirronnement ?"
@@ -109,6 +110,7 @@ app.command('/server_status', async ({ ack, body,view, client, user_name }) => {
           },
           {
             type: "section",
+            block_id:"choose_api",
             text: {
               type: "mrkdwn",
               text: "Pour quel API ?"
@@ -159,11 +161,13 @@ app.command('/server_status', async ({ ack, body,view, client, user_name }) => {
     });
     console.log(result);
 
-    const user = body ['body']['id'];
+    const user = user['id'];
     console.log(view)
-    const val = view['state']['values']['block_1']['input_a'];
-    const results = await db.set(user.input, val)
+    const envSelected = view['state']['values']['choose_env']['static_select-action_env']['value'];
+    const apiSelected = view['state']['values']['choose_api']['static_select-action_api']['value'];
+    const results = await db.set(user.input, envSelected)
 
+    console.log('resultat du form: ', apiSelected, envSelected)
     let messageToReturn = "Trop bien biloute tu as submit un truc"
     if( results) {
       messageToReturn = "J' ai reussi a recup les datas du form"

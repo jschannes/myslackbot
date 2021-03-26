@@ -215,6 +215,7 @@ app.command('/server_status', async ({ ack, body, view, client, user }) => {
   }
 });
 
+const testChannelId = 'C01SD541CSE'
 app.view('view_form_status', async ({ ack, body, view, client, event, context }) => {
   // Acknowledge the view_submission event
   const user = body['user']['id'];
@@ -225,13 +226,13 @@ app.view('view_form_status', async ({ ack, body, view, client, event, context })
     msg = `You choose env ${envSelected.text.text} and choose api ${apiSelected.text.text}`;
     try {
       await client.chat.postMessage({
-        channel: user,
+        channel: testChannelId,
         blocks: [
         {
           type: "header",
           text: {
             type: "plain_text",
-            text: "API Status - CART - DEV",
+            text: `API Status - ${envSelected.text.text} - ${apiSelected.text.text}`,
             emoji: true
           }
         },
@@ -239,13 +240,14 @@ app.view('view_form_status', async ({ ack, body, view, client, event, context })
           type: "section",
           text: {
             type: "mrkdwn",
-            text: ":large_green_circle: *OK* / :red_circle: *NOT OK*, check in <https://google.com|Mattermost>"
+            text: ":large_green_circle: *OK* / :red_circle: *NOT OK*, check in <https://google.com|Mattermost> \n ${user} ask for it."
           }
         }
         ]});
     } catch (error) {
       console.error(error);
     }
+    
     await ack();
   } else {
     console.log('error')

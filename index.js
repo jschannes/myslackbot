@@ -88,7 +88,7 @@ app.action({ action_id: 'static_select-action_api'}, async (data) => {
 });
 
 // Listen for a slash command invocation
-app.command('/server_status', async ({ ack, body,view, client, user }) => {
+app.command('/server_status', async ({ ack, body, view, client, user }) => {
   // Acknowledge the command request
   await ack();
 
@@ -209,43 +209,52 @@ app.command('/server_status', async ({ ack, body,view, client, user }) => {
         }
       }
     });
-    console.log(result);
   }
   catch (error) {
     console.error(error);
   }
 });
 
-app.view('view_form_status', async ({ ack, body, view, client, context }) => {
+app.view('view_form_status', async ({ ack, body, view, client, event, context }) => {
   // Acknowledge the view_submission event
-  await ack();
-
   const user = body['user']['id'];
-  const envSelected = view['state']['values']['choose_env']['static_select-action_env']['selected_option']['text']['text'];
-  const apiSelected = view['state']['values']['choose_api']['static_select-action_api']['selected_option']['text']['text'];
-
-  let msg = "test"
-  if (envSelected) {
-    msg = `You choose env ${envSelected}`;
-  }
-  
+  const envSelected = view['state']['values']['choose_env']['static_select-action_env']['selected_option'];
+  const apiSelected = view['state']['values']['choose_api']['static_select-action_api']['selected_option'];
+  let msg
   if (envSelected && apiSelected) {
-    msg += ` end choose api ${apiSelected}`;
-  } else {
-    if( apiSelected)
-    {
-      msg = `You choose api ${apiSelected}`;
+    msg = `You choose env ${envSelected.text.text} and choose api ${apiSelected.text.text}`;
+    try {
+      await client.chat.postMessage({
+        channel: user,
+        blocks: [
+        {
+          type: "header",
+          text: {
+            type: "plain_text",
+            text: "API Status - CART - DEV",
+            emoji: true
+          }
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: ":large_green_circle: *OK* / :red_circle: *NOT OK*, check in <https://google.com|Mattermost>"
+          }
+        }
+        ]});
+    } catch (error) {
+      console.error(error);
     }
-  }
-
-  try {
-    await client.chat.postMessage({
-      channel: user,
-      text: msg
+    await ack();
+  } else {
+    console.log('error')
+    await ack({
+      "response_action": "errors",
+      "errors": {
+        "choose_env": "You may not select a due date in the past"
+      }
     });
-  }
-  catch (error) {
-    console.error(error);
   }
 });
 
